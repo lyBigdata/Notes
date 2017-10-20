@@ -1,0 +1,165 @@
+大数据学习笔记
+
+myBase 下载 http://www.wjjsoft.com/download.html 
+
+下载CentOS-6.5-x86 64-minimal.iso  (398M) 本次linux 用6.5版本
+ http://archive.kernel.org/centos-vault/6.5/isos/x86_64/CentOS-6.5-x86_64-minimal.iso    
+
+ CentOS7 下载
+http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso
+http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Everything-1708.iso
+http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1708.iso
+
+安装CentOS-6.5
+第一台机器 node1 ：用户密码 root/123456
+
+Xshell5
+下载  http://www.bajiege.com/resources/free/xshell5-2017-5-key.html 
+ 注册码 用户 /公司 /注册码 bingo/bingo/ 101210-450789-147200
+
+
+linux ---node1 --4基本网络配置
+1).编辑文件node1
+先备份
+[root@node1 ~]# cp /etc/sysconfig/network-scripts/ifcfg-eth0  /etc/sysconfig/network-scripts/ifcfg-eth0.backup
+
+[root@node1 ~]# cat /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+HWADDR=00:0C:29:0B:93:B6
+TYPE=Ethernet
+UUID=9035a959-3067-4432-ab02-8bcd8ae4bace
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR=192.168.1.121
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+
+2).重启网络：
+[root@node1 ~]# service network restart
+
+3).检查：ping 网关
+[root@node1 ~]# ping 192.168.1.121
+
+4).克隆node2 ，node3，node4
+克隆完后给每台分配mac地址
+
+5).进入每台的 
+[root@node2 ~]# vi /etc/sysconfig/network-scripts/ifcfg-eth0
+#注释UUID
+修改HWADDR=
+修改每台的 IPADDR=
+
+6).可以先备份70-persistent-net.rules文件再，删除文件/etc/udev/rules.d/70-persistent-net.rules
+[root@node2 ~]# rm -rf /etc/udev/rules.d/70-persistent-net.rules
+
+7).修改/etc/sysconfig/network文件每台主机名如下
+[root@node2 ~]# vi /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=node2
+GATEWAY=192.168.1.1
+
+8).修改 /etc/resolv.conf
+[root@node1 ~]# vi /etc/resolv.conf 
+DNS1=114.114.114.114
+DNS2=192.168.1.1
+nameserver 114.114.114.114
+设置完后
+[root@node1 ~]# service network restart
+再重新 ping www.baidu.com 就应该都通了
+
+9).重启启动linux: init 6
+
+node2网络配置
+[root@node2 ~]# vi /etc/sysconfig/network-scripts/ifcfg-eth0 
+DEVICE=eth0
+HWADDR=00:0C:29:8C:4A:03
+TYPE=Ethernet
+#UUID=9035a959-3067-4432-ab02-8bcd8ae4bace
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR=192.168.1.122
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+
+node3网络配置
+[root@node3 ~]# vi /etc/sysconfig/network-scripts/ifcfg-eth0 
+DEVICE=eth0
+HWADDR=00:0C:29:D4:73:C6
+TYPE=Ethernet
+#UUID=9035a959-3067-4432-ab02-8bcd8ae4bace
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR=192.168.1.123
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+
+node4网络配置
+[root@node4 ~]# vi /etc/sysconfig/network-scripts/ifcfg-eth0 
+DEVICE=eth0
+HWADDR=00:0C:29:31:EE:10
+TYPE=Ethernet
+#UUID=9035a959-3067-4432-ab02-8bcd8ae4bace
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR=192.168.1.124
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1  
+
+以上参考如下
+修改网络地址：
+        1、设置网卡为net模式
+        2、确保windows下的服务是否启动（dhcp，net服务）
+        3、编辑文件
+                vi /etc/sysconfig/network-scripts/ifcfg-eth0
+        4、ONBOOT=yes
+        5、设置静态IP
+                       BOOTPROTO=static
+                        IPADDR=
+                        NETMASK=
+                        GATEWAY=
+        6、重启网络：service network restart
+        7、检查：ping 网关（两个）
+        8、ping www.baidu.com
+        9、设置dns服务
+                vi /etc/resolv.conf
+                nameserver 114.114.114.114
+克隆
+1、克隆之后的操作系统需要重新分配物理地址
+        a、删除/etc/sysconfig/network-scripts/ifcfg-eth0 文件中的物理地址
+                删除两行：UUID和物理地址
+        b、删除文件/etc/udev/rules.d/70-persistent-net.rules
+                rm -rf /etc/udev/rules.d/70-persistent-net.rules
+2、修改主机名
+  /etc/sysconfig/network文件
+3、重启启动linux: init 6
+4 、 关机halt
+
+
+
+1.安装wget 命令
+[root@node1 ~]# yum install wget -y
+
+修改yum源
+先备份/etc/yum.repos.d/CentOS-Base.repo
+[root@node1 ~]# mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+
+下载
+[root@node1 ~]# wget http://mirrors.163.com/.help/CentOS6-Base-163.repo
+[root@node1 ~]# mv /etc/yum.repos.d/CentOS6-Base-163.repo  /etc/yum.repos.d/CentOS-Base.repo
+
+安装jdk 1.8 
+检查是否已经安装jdk 
+[root@bogon ~]# rpm -qa | grep java
+查看yum 库中的所有java 安装包
+[root@bogon ~]#  yum -y list java*
+开始安装1.8.0 jdk 当结果显示为Complete！即安装完毕
+[root@bogon ~]#  yum -y install java-1.8.0-openjdk*
+查看安装的版本
+[root@bogon ~]#  java -version
+openjdk version "1.8.0_144"
+OpenJDK Runtime Environment (build 1.8.0_144-b01)
+OpenJDK 64-Bit Server VM (build 25.144-b01, mixed mode)
