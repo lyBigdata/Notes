@@ -1,0 +1,242 @@
+nginx 
+下载   http://nginx.org/en/download.html   下载稳定版本 Stable version
+下载完后是 nginx-1.12.tar.gz 下载完后源码安装
+1.下载
+wget http://nginx.org/download/nginx-1.12.2.tar.gz
+2.解压
+ 在当前目录下解压
+[root@node1 ~]# tar -zxvf nginx-1.12.2.tar.gz
+3.查看安装help
+[root@node1 nginx-1.12.2]# ./configure --help  # 查看安装的help 
+4.安装在/usr/nginx-1.12.2 这个路径下
+[root@node1 nginx-1.12.2]# ./configure --prefix=/usr/nginx-1.12.2
+检查出pcre，zlib 依赖库没有安装
+ [root@node1 nginx-1.12.2]# yum  install  pcre-devel -y
+ [root@node1 nginx-1.12.2]# yum  install zlib-devel -y
+5编译
+ [root@node1 nginx-1.12.2]# make
+6.安装
+ [root@node1 nginx-1.12.2]# make install
+
+
+
+1）.安装完后查看安装后的软件
+ [root@node1 nginx-1.12.2]# cd /usr/nginx-1.12.2
+[root@node1 nginx-1.12.2]# ls -il
+total 16
+281005 drwxr-xr-x. 2 root root 4096 Oct 21 23:34 conf
+281022 drwxr-xr-x. 2 root root 4096 Oct 21 23:34 html
+281021 drwxr-xr-x. 2 root root 4096 Oct 21 23:34 logs
+281003 drwxr-xr-x. 2 root root 4096 Oct 21 23:34 sbin
+2）进入sbin目录下
+[root@node1 nginx-1.12.2]# cd sbin/
+[root@node1 sbin]# pwd
+/usr/nginx-1.12.2/sbin
+3）查看nginx
+[root@node1 sbin]# ls
+nginx
+4）启动nginx
+[root@node1 sbin]# ./nginx
+5）关闭防火墙
+[root@node1 sbin]# service iptables stop
+iptables: Setting chains to policy ACCEPT: filter          [  OK  ]
+iptables: Flushing firewall rules:                         [  OK  ]
+iptables: Unloading modules:                               [  OK  ]
+6）在浏览器是访问当前服务
+http://192.168.1.124/
+在浏览器是访问当前服务显示Welcome to nginx! 表示成功了
+
+nginx设置开机启动
+1.进入这个路径增加nginx文件
+[root@node1 ~]# vi /etc/init.d/nginx
+增加一个nginx文件 内容如下
+#!/bin/sh
+#
+# nginx - this script starts and stops the nginx daemon
+#
+# chkconfig:   - 85 15
+# description:  NGINX is an HTTP(S) server, HTTP(S) reverse \
+#               proxy and IMAP/POP3 proxy server
+# processname: nginx
+# config:      /etc/nginx/nginx.conf
+# config:      /etc/sysconfig/nginx
+# pidfile:     /var/run/nginx.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+nginx="/usr/nginx-1.12.2/sbin/nginx"
+prog=$(basename $nginx)
+NGINX_CONF_FILE="/usr/nginx-1.12.2/conf/nginx.conf"
+
+[ -f /etc/sysconfig/nginx ] && . /etc/sysconfig/nginx
+
+lockfile=/var/lock/subsys/nginx
+
+make_dirs() {
+   # make required directories
+   user=`$nginx -V 2>&1 | grep "configure arguments:" | sed 's/[^*]*--user=\([^ ]*\).*/\1/g' -`
+   if [ -z "`grep $user /etc/passwd`" ]; then
+       useradd -M -s /bin/nologin $user
+   fi
+   options=`$nginx -V 2>&1 | grep 'configure arguments:'`
+   for opt in $options; do
+       if [ `echo $opt | grep '.*-temp-path'` ]; then
+           value=`echo $opt | cut -d "=" -f 2`
+           if [ ! -d "$value" ]; then
+               # echo "creating" $value
+               mkdir -p $value && chown -R $user $value
+           fi
+       fi
+   done
+}
+
+start() {
+    [ -x $nginx ] || exit 5
+    [ -f $NGINX_CONF_FILE ] || exit 6
+    make_dirs
+    echo -n $"Starting $prog: "
+    daemon $nginx -c $NGINX_CONF_FILE
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -QUIT
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    configtest || return $?
+    stop
+    sleep 1
+    start
+}
+
+reload() {
+    configtest || return $?
+    echo -n $"Reloading $prog: "
+    killproc $nginx -HUP
+    RETVAL=$?
+    echo
+}
+
+force_reload() {
+    restart
+}
+
+configtest() {
+  $nginx -t -c $NGINX_CONF_FILE
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart|configtest)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+            ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}"
+        exit 2
+esac
+
+
+2.
+修改两处路径
+　　第一：nginx="/usr/nginx-1.12.2/sbin/nginx"
+　　　　　这里修改成你nginx安装时启动文件放在的路径，比如我nginx安装在/usr/nginx中，对应启动文件在
+　　　　　/usrnginx-1.12.2/sbin/nginx，所以把nginx启动路径换成 nginx="/usr/nginx-1.12.2/sbin/nginx"
+
+　 第二：NGINX_CONF_FILE="/usr/nginx-1.12.2/nginx.conf"
+　　　　 这里同上面一样，我的nginx配置文件也放在 /usr/local/nginx安装目录中，具体在/usr/nginx-1.12.2/conf/nginx.conf
+　　　　 所以把nginx配置路径换成 NGINX_CONF_FILE="/usr/nginx-1.12.2/conf/nginx.conf"
+
+3.增加权限
+[root@node1 init.d]# chmod +x nginx
+
+4.先将nginx服务加入chkconfig管理列表
+chkconfig --add /etc/init.d/nginx
+
+5.启动停止重启
+#service nginx start
+#service nginx stop
+#service nginx reload
+
+6.设置开机启动
+[root@node1 init.d]# chkconfig nginx on
+
+
+查看防火墙是否启动
+service  iptables status 
+这样表示没有启动
+[root@node1 init.d]# service  iptables status
+iptables: Firewall is not running.
+
+
+
+Nginx和Tengine区别比较查看官网
+http://nginx.org/
+http://tengine.taobao.org/
+
+1.高并发
+2.高可用
+3.负载均衡
+
+nginx 
+1.负载均衡
+2静态web服务器
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

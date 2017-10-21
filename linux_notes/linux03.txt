@@ -1,5 +1,4 @@
 大数据学习笔记
-
 myBase 下载 http://www.wjjsoft.com/download.html 
 
 下载CentOS-6.5-x86 64-minimal.iso  (398M) 本次linux 用6.5版本
@@ -134,28 +133,60 @@ GATEWAY=192.168.1.1
         b、删除文件/etc/udev/rules.d/70-persistent-net.rules
                 rm -rf /etc/udev/rules.d/70-persistent-net.rules
 2、修改主机名
-  /etc/sysconfig/network文件
+   /etc/sysconfig/network文件
 3、重启启动linux: init 6
 4 、 关机halt
 
 
 
-1.安装wget 命令
+1.安装wget  ，tree 命令
 [root@node1 ~]# yum install wget -y
+[root@node1 ~]# yum install tree -y
+[root@node1 ~]# yum  install nano  -y 
+[root@node1 ~]# yum  install httpd  -y
+[root@node1 ~]# yum  install grouplist -y  
+[root@node1 ~]# yum groupinstall Development tools -y  # 安装Development tools这个组下的所有工具包主要是常用的编译开发工具
 
-修改yum源
+groupinfo 显示信息
+grouplist 查询
+groupinstall 安装
+groupremove 删除
+groupupdate  更新
+
+chkconfig命令使用语法： 
+    chkconfig[--add][--del][--list][系统服务]或chkconfig[--level<等级代号>][系统服务][on/off/reset] 
+    参数用法： 
+    --add:增加所指定的系统服务，让chkconfig指令得以管理它，并同时在系统启动的叙述文件内增加相关数据。 
+    --del:删除所指定的系统服务，不再由chkconfig指令管理，并同时在系统启动的叙述文件内删除相关数据。
+    --level<等级代号>:指定读系统服务要在哪一个执行等级中开启或关毕。使用范例：
+chkconfig --list 列出所有的系统服务 
+chkconfig --add httpd 增加httpd服务 
+chkconfig --del httpd 删除httpd服务 
+
+
+
+
+
+ 
+修改yum源 http://mirrors.163.com/.help/centos.html 或者 http://mirrors.aliyun.com/help/centos
 先备份/etc/yum.repos.d/CentOS-Base.repo
 [root@node1 ~]# mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-
-下载
+下载 
 [root@node1 ~]# wget http://mirrors.163.com/.help/CentOS6-Base-163.repo
 [root@node1 ~]# mv /etc/yum.repos.d/CentOS6-Base-163.repo  /etc/yum.repos.d/CentOS-Base.repo
+[root@node1 ~]#yum makecache #生成缓存
+
+
+
 
 安装jdk 1.8 
 检查是否已经安装jdk 
 [root@bogon ~]# rpm -qa | grep java
 查看yum 库中的所有java 安装包
 [root@bogon ~]#  yum -y list java*
+或
+[root@bogon ~]#  yum search jdk
+
 开始安装1.8.0 jdk 当结果显示为Complete！即安装完毕
 [root@bogon ~]#  yum -y install java-1.8.0-openjdk*
 查看安装的版本
@@ -163,3 +194,57 @@ GATEWAY=192.168.1.1
 openjdk version "1.8.0_144"
 OpenJDK Runtime Environment (build 1.8.0_144-b01)
 OpenJDK 64-Bit Server VM (build 25.144-b01, mixed mode)
+
+安装软件步骤
+     1.检查是否已经安装
+         如： rpm -qa | grep jdk
+      2.下载软件包
+          rpm  ,wget
+       3. 安装
+           linux安装的时候有些软件有依赖
+           可以用yum 安装来管理软件包的依赖和兼容
+           rpm安装后需要配置环境变量
+
+源码安装步骤
+ 1.下载
+	wget url
+2.查看源码
+	进入源码src下查看什么语言编写的如 .c文件为C语言
+3.准备编译环境
+	第一次的环境安装 编译工具yum groupinstall Development tools -y
+4.检查（依赖，兼容）（预编译）
+  	进入下载后解压的软件 ，找到 configure 在目录下执行  ./configure --help  查看--help
+5.编译
+
+6.安装
+                                        
+
+
+rpm 安装软件
+[root@bogon ~]# rpm -ivh 软件包
+[root@bogon ~]# rpm -qi  jdk #  查看jdk 的信息 ，必须是用rpm安装的才可以看得到
+
+[root@bogon ~]# ls /mnt/Packages  #查看本地下的rpm软件包
+
+
+
+
+
+
+
+Shell编程
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
