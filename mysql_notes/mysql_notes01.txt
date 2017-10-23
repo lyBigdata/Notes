@@ -1,0 +1,33 @@
+mysql 安装
+下载  https://dev.mysql.com/downloads/mysql/
+用yum 安装mysql步骤参考
+http://www.cnblogs.com/renjidong/p/7047396.html
+
+mysql安装步骤
+1.检查自带的mysql 
+[root@node1 ~]# yum list install |grep mysql
+2.如果检查有就卸载
+[root@node1 ~]# yum -y remove mysql-libs.x86_64
+3.下载mysql的 rpm文件
+[root@node1 ~]# wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+4.检查
+接着执行这句,解释一下，这个rpm还不是mysql的安装文件，只是两个yum源文件，执行后，在/etc/yum.repos.d/ 这个目录下多出mysql-community-source.repo和mysql-community.repo
+[root@node1 ~]# rpm -ivh mysql-community-release-el6-5.noarch.rpm
+5.查看要安装的mysql
+[root@node1 ~]# yum repolist all | grep mysql
+6.安装
+[root@node1 ~]# yum install mysql-community-server
+7.安装后启动
+[root@node1 ~]# service mysqld start
+8由于mysql刚刚安装完的时候，mysql的root用户的密码默认是空的，所以我们需要及时用mysql的root用户登录（第一次回车键，不用输入密码），并修改密码（目前密码为空没有设置密码）
+[root@node1 ~]#  mysql -u root
+[root@node1 ~]#  use mysql;
+[root@node1 ~]#  update user set password=PASSWORD("这里输入root用户密码") where User='root';
+[root@node1 ~]#  flush privileges;
+9.查看mysql是否自启动,并且设置开启自启动命令
+[root@node1 ~]# chkconfig --list | grep mysqld
+mysqld                0:off        1:off        2:off        3:on        4:on        5:on        6:off
+设置开机启动
+[root@node1 ~]#chkconfig mysqld on
+10.mysql安全设置(系统会一路问你几个问题，看不懂复制之后翻译，基本上一路yes)
+ [root@node1 ~]# mysql_secure_installation
