@@ -1,4 +1,4 @@
-nginx 
+﻿nginx 
 下载   http://nginx.org/en/download.html   下载稳定版本 Stable version
 下载完后是 nginx-1.12.tar.gz 下载完后源码安装
 1.下载
@@ -233,7 +233,27 @@ nginx
 
 
 
+添加虚拟IP 
+[root@node1 conf]# ifconfig eth0:1 192.168.17.22 netmask 225.225.225.0
+查询ip
+[root@node1 conf]# ifconfig
+eth0:1    Link encap:Ethernet  HWaddr 00:0C:29:0B:93:B6 
+          inet addr:192.168.17.22  Bcast:222.190.31.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+删除虚拟ip
+[root@node1 conf]# ifconfig eth0:1 down
 
+
+
+tomcat 
+
+下载
+[root@node1 ~]# wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-7/v7.0.82/bin/apache-tomcat-7.0.82.tar.gz
+解压
+[root@node1 ~]# tar -zxvf apache-tomcat-7.0.82.tar.gz 
+启动tomcat 
+[root@node1 ~]# apache-tomcat-7.0.82/bin/startup.sh 
+在防火墙下加8080端口然后访问就OK
 
 
 
