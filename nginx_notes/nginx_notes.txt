@@ -213,11 +213,14 @@ iptables: Firewall is not running.
 
 在防火墙加 80 和 3306端口
 vi /etc/sysconfig/iptables 
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 -A INPUT -m state –state NEW -m tcp -p tcp –dport 80 -j ACCEPT（允许80端口通过防火墙） 
 -A INPUT -m state –state NEW -m tcp -p tcp –dport 3306 -j ACCEPT（允许3306端口通过防火墙） 
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
 
-/etc/init.d/iptables restart  
      #最后重启防火墙使配置生效
+/etc/init.d/iptables restart  或者
+[root@node1 sysconfig]# service iptables restart
 
 Nginx和Tengine区别比较查看官网
 http://nginx.org/
