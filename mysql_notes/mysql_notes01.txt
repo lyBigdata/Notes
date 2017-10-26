@@ -31,3 +31,96 @@ mysqld                0:off        1:off        2:off        3:on        4:on   
 [root@node1 ~]#chkconfig mysqld on
 10.mysql安全设置(系统会一路问你几个问题，看不懂复制之后翻译，基本上一路yes)
  [root@node1 ~]# mysql_secure_installation
+
+
+
+
+
+
+
+
+
+
+mamcached
+
+步骤
+
+1.安装mamcached
+
+yum -y install memcached
+
+service memcached start
+
+yum -y install telnet 
+
+用 telnet localhost 11211 测试memcached 是否安装成功
+
+set abc 0 0 5 
+
+12345
+
+get abc
+
+2.web服务器连接memcached 的jar 包 拷贝到tomcat的lib下
+
+3. 修改server.xml里面修改Engine标签，添加jvmRoute属性，目的是查看sessionid里面带有tomcat的名字，就是这里配置的jvmRoute
+
+<Engine name="Catalina" defaultHost="localhost" jvmRoute="tomcat1">
+
+4配置tomcat的conf目录下的context.xml
+
+<Manager className="de.javakaffee.web.msm.MemcachedBackupSessionManager"
+
+        memcachedNodes="n1:192.168.1.121:11211"
+
+    sticky="false"
+
+    lockingMode="auto"
+
+    sessionBackupAsync="false"
+
+        requestUriIgnorePattern=".*\.(ico|png|gif|jpg|css|js)$"
+
+sessionBackupTimeout="1000" transcoderFactoryClass="de.javakaffee.web.msm.serializer.kryo.KryoTranscoderFactory" />
+
+配置memcachedNodes属性，配置memcached数据库的ip和端口，默认11211，多个的话用空格隔开
+
+目的？让tomcat服务器从memcached缓存里面拿session或者是放session
+
+5 修改index.jsp，取sessionid看一看
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+
+<html lang="en">
+
+SessionID:<%=session.getId()%>
+
+</br>
+
+SessionIP:<%=request.getServerName()%>
+
+</br>
+
+<h1>tomcat1</h1>
+
+</html>
+
+
+
+redis安装
+
+$ wget http://download.redis.io/releases/redis-4.0.2.tar.gz
+$ tar xzf redis-4.0.2.tar.gz
+$ cd redis-4.0.2
+$ make
+
+运行
+$ src/redis-server
+测试redis
+$ src/redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+
+
