@@ -259,6 +259,10 @@ tomcat
 在防火墙下加8080端口然后访问就OK
 
 
+启动httpd  -----Apache
+[root@node1 ~]# service httpd start
+[root@node1 ~]# netstat -nplt  # 查看端口号
+浏览器访问OK
 
 
 
