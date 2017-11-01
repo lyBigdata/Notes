@@ -1,0 +1,174 @@
+redis 
+
+
+redis基本使用
+
+
+简单命令
+set key veule
+get  查看get命令
+keys * 查询所有
+127.0.0.1:6379> keys *
+1) "name"
+del  删除 根据key删除
+
+
+redis 学习记录
+第一课
+命令查看官网文档
+http://doc.redisfans.com/
+
+linux 下redis安装
+#yum -y install gcc-c++  # 必须要先安装这个gcc和c++
+#redis 下载
+下载 #wget http://download.redis.io/releases/redis-3.2.11.tar.gz
+解压 #tar -zxvf redis-3.2.11.tar.gz
+编译
+解压完后进入 redis目录
+#cd redis-3.2.11
+#make
+make编译完后在安装
+#make PREFIX=/usr/local/redis install 
+进入安装后查看的目录
+#cd /usr/local/redis/bin
+在到redis-3.2.11下把 redis.conf 拷贝到 /usr/local/redis/
+#cp redis-3.2.11/redis.conf  /usr/local/redis/
+查看拷贝的文件
+修改配置
+#vi /usr/local/redis/redis.conf 
+修改 daemonize on 改为yes
+
+设置开机自动启动查看着两篇博客
+http://www.cnblogs.com/silent2012/p/4157728.html
+http://www.jb51.net/article/110286.htm
+
+启动在后台启动
+[root@bogon ~]# cd /usr/local/redis/
+[root@bogon redis]# pwd
+/usr/local/redis
+[root@bogon redis]# bin/redis-server redis.conf 
+查看启动
+#ps -ef|grep -i redis
+如下
+[root@bogon redis]# ps -ef|grep -i redis
+root       1528      1  0 04:30 ?        00:00:17 bin/redis-server 127.0.0.1:6379
+root       2817   2654  0 08:15 pts/1    00:00:00 grep --color=auto -i redis
+
+关闭
+[root@bogon redis]# bin/redis-cli shutdown
+查看
+[root@bogon redis]# ps -ef|grep -i redis
+
+进入客户端
+[root@bogon redis]# bin/redis-cli 
+127.0.0.1:6379> 
+
+
+
+第二课 
+用java连接 用jedis连接Redis
+写一个demo 
+可以用maven项目
+  <dependencies>
+	 <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+	<dependency>
+	    <groupId>redis.clients</groupId>
+	    <artifactId>jedis</artifactId>
+	    <version>2.9.0</version>
+	</dependency>
+  </dependencies>
+
+
+
+import redis.clients.jedis.Jedis;
+
+public class JedisTest {
+	public static void main(String[] args) {
+		
+		Jedis jedis=new Jedis("192.168.1.102",6379);
+		jedis.set("name","tom");
+		String value=jedis.get("name");
+		System.out.println(value);
+		jedis.close();
+	}
+}
+
+启动报错 是因为防火墙没开， 要到
+vi /etc/sysconfig/iptables 
+添加6379端口 
+-A INPUT -m state –state NEW -m tcp -p tcp –dport 6379 -j ACCEPT 
+
+修改bin/redis.conf 的127.0.0.1 注释掉 #bind 127.0.0.1
+修改 protected-mode yes 改为no
+
+然后关闭
+[root@bogon redis]# bin/redis-cli shutdown
+再启动
+[root@bogon redis]# bin/redis-server redis.conf 
+
+ 在运行java代码就OK了
+
+上面第一种方法
+
+Jedis连接池的使用
+
+第二种设置密码
+修改bin/redis.conf 中修改 protected-mode no 改为yes
+然后关闭
+[root@bogon redis]# bin/redis-cli shutdown
+再启动
+[root@bogon redis]# bin/redis-server redis.conf 
+
+设置密码
+[root@bogon redis]# bin/redis-cli 
+127.0.0.1:6379> config set requirepass 123456
+ok
+127.0.0.1:6379>quit
+通过密码进入
+[root@bogon redis]# bin/redis-cli 
+127.0.0.1:6379>auth 123456
+ok
+127.0.0.1:6379>
+
+java代码要加密码jedis.auth("123456")；不加报错
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+
+public class JedisPooltest {
+public static void main(String[] args) {
+		
+		JedisPoolConfig config= new JedisPoolConfig(); //连接配置
+		config.setMaxTotal(100); //设置连接数最大100个
+		config.setMaxIdle(10); //最大空闲连接数10个
+		
+		JedisPool  jedisPool =new JedisPool(config ,"192.168.1.102",6379);
+		Jedis jedis=null; 
+		try {
+			jedis=jedisPool.getResource();
+			jedis.auth("123456");//password
+			jedis.set("name","tom");
+			String value=jedis.get("name");
+			System.out.println(value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(jedis!=null){
+				jedis.close(); //释放
+			}
+			if(jedisPool!=null){
+				jedisPool.close(); //释放
+			}
+		}
+		
+	}
+
+搭集群前要删除以前操作的数据，不然会报错 ， 还要重新删除掉
+集群配置
+进入cd download/redis-3.2.11/src/先拷贝redis-trib.rb到/usr/local/bin路径下
+[root@bogon /]# cd download/redis-3.2.11/src/
+[root@bogon src]# cp redis-trib.rb  /usr/local/bin
+
+
+1.先配置端口，进入配置文件修改
