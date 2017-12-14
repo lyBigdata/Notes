@@ -1,74 +1,173 @@
+
+åœ¨mac ç¯å¢ƒå®‰è£…
+
+ä¸‹è½½redis æ‰“å¼€å®˜ç½‘ï¼šhttps://redis.io/ ä¸‹è½½æœ€ç¨³å®šçš„ç‰ˆæœ¬
+
+è§£å‹
+tar zxvf redis-4.0.6.tar.gz
+
+æ‹·è´åˆ° usr/local/ç›®å½•ä¸‹
+sudo mv redis-4.0.6 /usr/local/
+
+è¿›å…¥ç›®å½•
+cd /usr/local/redis-4.0.6/
+
+ç¼–è¯‘æµ‹è¯•
+sudo make test
+
+ç¼–è¯‘å®‰è£…
+sudo make install
+
+å¯åŠ¨Redis
+redis-server
+
+é…ç½®
+åœ¨redisç›®å½•ä¸‹å»ºç«‹binï¼Œetcï¼Œdbä¸‰ä¸ªç›®å½•
+sudo mkdir  /usr/local/redis-4.0.6/bin
+sudo mkdir  /usr/local/redis-4.0.6/etc
+sudo mkdir  /usr/local/redis-4.0.6/db
+
+æŠŠ/usr/local/redis/srcç›®å½•ä¸‹çš„mkreleasehdr.shï¼Œredis-benchmarkï¼Œ redis-check-rdbï¼Œ redis-cliï¼Œ redis-serveræ‹·è´åˆ°binç›®å½•
+cp /usr/local/redis-4.0.6/src/mkreleasehdr.sh /usr/local/redis-4.0.6/bin
+cp /usr/local/redis-4.0.6/src/redis-benchmark /usr/local/redis-4.0.6/bin
+cp /usr/local/redis-4.0.6/src/redis-check-rdb /usr/local/redis-4.0.6/bin
+cp /usr/local/redis-4.0.6/src/redis-cli /usr/local/redis-4.0.6/bin
+cp /usr/local/redis-4.0.6/src/redis-server /usr/local/redis-4.0.6/bin
+
+æ‹·è´ redis.conf åˆ° /usr/local/redis/etcä¸‹
+cp /usr/local/redis-4.0.6/redis.conf /usr/local/redis-4.0.6/etc
+
+
+
+ä¿®æ”¹redis.conf ä¿®æ”¹å‰å¤‡ä»½ä¸€ä»½é…ç½®
+
+#ä¿®æ”¹ä¸ºå®ˆæŠ¤æ¨¡å¼
+daemonize yes
+#è®¾ç½®è¿›ç¨‹é”æ–‡ä»¶
+pidfile /usr/local/redis-3.2.8/redis.pid
+#ç«¯å£
+port 6379
+#å®¢æˆ·ç«¯è¶…æ—¶æ—¶é—´
+timeout 300
+#æ—¥å¿—çº§åˆ«
+loglevel debug
+#æ—¥å¿—æ–‡ä»¶ä½ç½®
+logfile /usr/local/redis-3.2.8/log-redis.log
+#è®¾ç½®æ•°æ®åº“çš„æ•°é‡ï¼Œé»˜è®¤æ•°æ®åº“ä¸º0ï¼Œå¯ä»¥ä½¿ç”¨SELECT <dbid>å‘½ä»¤åœ¨è¿æ¥ä¸ŠæŒ‡å®šæ•°æ®åº“id
+databases 16
+##æŒ‡å®šåœ¨å¤šé•¿æ—¶é—´å†…ï¼Œæœ‰å¤šå°‘æ¬¡æ›´æ–°æ“ä½œï¼Œå°±å°†æ•°æ®åŒæ­¥åˆ°æ•°æ®æ–‡ä»¶ï¼Œå¯ä»¥å¤šä¸ªæ¡ä»¶é…åˆ
+#save <seconds> <changes>
+#Redisé»˜è®¤é…ç½®æ–‡ä»¶ä¸­æä¾›äº†ä¸‰ä¸ªæ¡ä»¶ï¼š
+save 900 1
+save 300 10
+save 60 10000
+#æŒ‡å®šå­˜å‚¨è‡³æœ¬åœ°æ•°æ®åº“æ—¶æ˜¯å¦å‹ç¼©æ•°æ®ï¼Œé»˜è®¤ä¸ºyesï¼ŒRedisé‡‡ç”¨LZFå‹ç¼©ï¼Œå¦‚æœä¸ºäº†èŠ‚çœCPUæ—¶é—´ï¼Œ
+#å¯ä»¥å…³é—­è¯¥#é€‰é¡¹ï¼Œä½†ä¼šå¯¼è‡´æ•°æ®åº“æ–‡ä»¶å˜çš„å·¨å¤§
+rdbcompression yes
+#æŒ‡å®šæœ¬åœ°æ•°æ®åº“æ–‡ä»¶å
+dbfilename dump.rdb
+#æŒ‡å®šæœ¬åœ°æ•°æ®åº“è·¯å¾„
+dir /usr/local/redis-3.2.8/db/
+#æŒ‡å®šæ˜¯å¦åœ¨æ¯æ¬¡æ›´æ–°æ“ä½œåè¿›è¡Œæ—¥å¿—è®°å½•ï¼ŒRedisåœ¨é»˜è®¤æƒ…å†µä¸‹æ˜¯å¼‚æ­¥çš„æŠŠæ•°æ®å†™å…¥ç£ç›˜ï¼Œå¦‚æœä¸å¼€å¯ï¼Œå¯èƒ½
+#ä¼šåœ¨æ–­ç”µæ—¶å¯¼è‡´ä¸€æ®µæ—¶é—´å†…çš„æ•°æ®ä¸¢å¤±ã€‚å› ä¸º redisæœ¬èº«åŒæ­¥æ•°æ®æ–‡ä»¶æ˜¯æŒ‰ä¸Šé¢saveæ¡ä»¶æ¥åŒæ­¥çš„ï¼Œæ‰€ä»¥æœ‰
+#çš„æ•°æ®ä¼šåœ¨ä¸€æ®µæ—¶é—´å†…åªå­˜åœ¨äºå†…å­˜ä¸­
+appendonly no
+#æŒ‡å®šæ›´æ–°æ—¥å¿—æ¡ä»¶ï¼Œå…±æœ‰3ä¸ªå¯é€‰å€¼ï¼š
+#noï¼šè¡¨ç¤ºç­‰æ“ä½œç³»ç»Ÿè¿›è¡Œæ•°æ®ç¼“å­˜åŒæ­¥åˆ°ç£ç›˜ï¼ˆå¿«ï¼‰
+#alwaysï¼šè¡¨ç¤ºæ¯æ¬¡æ›´æ–°æ“ä½œåæ‰‹åŠ¨è°ƒç”¨fsync()å°†æ•°æ®å†™åˆ°ç£ç›˜ï¼ˆæ…¢ï¼Œå®‰å…¨ï¼‰
+#everysecï¼šè¡¨ç¤ºæ¯ç§’åŒæ­¥ä¸€æ¬¡ï¼ˆæŠ˜è¡·ï¼Œé»˜è®¤å€¼ï¼‰
+appendfsync everysec
+
+
+å¯åŠ¨æœåŠ¡
+./bin/redis-server etc/redis.conf
+æŸ¥çœ‹æ—¥å¿—
+tail -f log-redis.log
+
+æ‰“å¼€å®¢æˆ·ç«¯
+./bin/redis-cli
+
+
+
+
+
+
+
+
+ä»¥ä¸‹æ˜¯ linux ç¯å¢ƒ
+
+
 redis 
 
 
-redis»ù±¾Ê¹ÓÃ
+redisåŸºæœ¬ä½¿ç”¨
 
 
-¼òµ¥ÃüÁî
+ç®€å•å‘½ä»¤
 set key veule
-get  ²é¿´getÃüÁî
-keys * ²éÑ¯ËùÓĞ
+get  æŸ¥çœ‹getå‘½ä»¤
+keys * æŸ¥è¯¢æ‰€æœ‰
 127.0.0.1:6379> keys *
 1) "name"
-del  É¾³ı ¸ù¾İkeyÉ¾³ı
+del  åˆ é™¤ æ ¹æ®keyåˆ é™¤
 
 
-redis Ñ§Ï°¼ÇÂ¼
-µÚÒ»¿Î
-ÃüÁî²é¿´¹ÙÍøÎÄµµ
+redis å­¦ä¹ è®°å½•
+ç¬¬ä¸€è¯¾
+å‘½ä»¤æŸ¥çœ‹å®˜ç½‘æ–‡æ¡£
 http://doc.redisfans.com/
 
-linux ÏÂredis°²×°
-#yum -y install gcc-c++  # ±ØĞëÒªÏÈ°²×°Õâ¸ögccºÍc++
-#redis ÏÂÔØ
-ÏÂÔØ #wget http://download.redis.io/releases/redis-3.2.11.tar.gz
-½âÑ¹ #tar -zxvf redis-3.2.11.tar.gz
-±àÒë
-½âÑ¹Íêºó½øÈë redisÄ¿Â¼
+linux ä¸‹rediså®‰è£…
+#yum -y install gcc-c++  # å¿…é¡»è¦å…ˆå®‰è£…è¿™ä¸ªgccå’Œc++
+#redis ä¸‹è½½
+ä¸‹è½½ #wget http://download.redis.io/releases/redis-3.2.11.tar.gz
+è§£å‹ #tar -zxvf redis-3.2.11.tar.gz
+ç¼–è¯‘
+è§£å‹å®Œåè¿›å…¥ redisç›®å½•
 #cd redis-3.2.11
 #make
-make±àÒëÍêºóÔÚ°²×°
+makeç¼–è¯‘å®Œååœ¨å®‰è£…
 #make PREFIX=/usr/local/redis install 
-½øÈë°²×°ºó²é¿´µÄÄ¿Â¼
+è¿›å…¥å®‰è£…åæŸ¥çœ‹çš„ç›®å½•
 #cd /usr/local/redis/bin
-ÔÚµ½redis-3.2.11ÏÂ°Ñ redis.conf ¿½±´µ½ /usr/local/redis/
+åœ¨åˆ°redis-3.2.11ä¸‹æŠŠ redis.conf æ‹·è´åˆ° /usr/local/redis/
 #cp redis-3.2.11/redis.conf  /usr/local/redis/
-²é¿´¿½±´µÄÎÄ¼ş
-ĞŞ¸ÄÅäÖÃ
+æŸ¥çœ‹æ‹·è´çš„æ–‡ä»¶
+ä¿®æ”¹é…ç½®
 #vi /usr/local/redis/redis.conf 
-ĞŞ¸Ä daemonize on ¸ÄÎªyes
+ä¿®æ”¹ daemonize on æ”¹ä¸ºyes
 
-ÉèÖÃ¿ª»ú×Ô¶¯Æô¶¯²é¿´×ÅÁ½Æª²©¿Í
+è®¾ç½®å¼€æœºè‡ªåŠ¨å¯åŠ¨æŸ¥çœ‹ç€ä¸¤ç¯‡åšå®¢
 http://www.cnblogs.com/silent2012/p/4157728.html
 http://www.jb51.net/article/110286.htm
 
-Æô¶¯ÔÚºóÌ¨Æô¶¯
+å¯åŠ¨åœ¨åå°å¯åŠ¨
 [root@bogon ~]# cd /usr/local/redis/
 [root@bogon redis]# pwd
 /usr/local/redis
 [root@bogon redis]# bin/redis-server redis.conf 
-²é¿´Æô¶¯
+æŸ¥çœ‹å¯åŠ¨
 #ps -ef|grep -i redis
-ÈçÏÂ
+å¦‚ä¸‹
 [root@bogon redis]# ps -ef|grep -i redis
 root       1528      1  0 04:30 ?        00:00:17 bin/redis-server 127.0.0.1:6379
 root       2817   2654  0 08:15 pts/1    00:00:00 grep --color=auto -i redis
 
-¹Ø±Õ
+å…³é—­
 [root@bogon redis]# bin/redis-cli shutdown
-²é¿´
+æŸ¥çœ‹
 [root@bogon redis]# ps -ef|grep -i redis
 
-½øÈë¿Í»§¶Ë
+è¿›å…¥å®¢æˆ·ç«¯
 [root@bogon redis]# bin/redis-cli 
 127.0.0.1:6379> 
 
 
 
-µÚ¶ş¿Î 
-ÓÃjavaÁ¬½Ó ÓÃjedisÁ¬½ÓRedis
-Ğ´Ò»¸ödemo 
-¿ÉÒÔÓÃmavenÏîÄ¿
+ç¬¬äºŒè¯¾ 
+ç”¨javaè¿æ¥ ç”¨jedisè¿æ¥Redis
+å†™ä¸€ä¸ªdemo 
+å¯ä»¥ç”¨mavené¡¹ç›®
   <dependencies>
 	 <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
 	<dependency>
@@ -93,44 +192,44 @@ public class JedisTest {
 	}
 }
 
-Æô¶¯±¨´í ÊÇÒòÎª·À»ğÇ½Ã»¿ª£¬ Òªµ½
+å¯åŠ¨æŠ¥é”™ æ˜¯å› ä¸ºé˜²ç«å¢™æ²¡å¼€ï¼Œ è¦åˆ°
 vi /etc/sysconfig/iptables 
-Ìí¼Ó6379¶Ë¿Ú 
--A INPUT -m state ¨Cstate NEW -m tcp -p tcp ¨Cdport 6379 -j ACCEPT 
+æ·»åŠ 6379ç«¯å£ 
+-A INPUT -m state â€“state NEW -m tcp -p tcp â€“dport 6379 -j ACCEPT 
 
-ĞŞ¸Äbin/redis.conf µÄ127.0.0.1 ×¢ÊÍµô #bind 127.0.0.1
-ĞŞ¸Ä protected-mode yes ¸ÄÎªno
+ä¿®æ”¹bin/redis.conf çš„127.0.0.1 æ³¨é‡Šæ‰ #bind 127.0.0.1
+ä¿®æ”¹ protected-mode yes æ”¹ä¸ºno
 
-È»ºó¹Ø±Õ
+ç„¶åå…³é—­
 [root@bogon redis]# bin/redis-cli shutdown
-ÔÙÆô¶¯
+å†å¯åŠ¨
 [root@bogon redis]# bin/redis-server redis.conf 
 
- ÔÚÔËĞĞjava´úÂë¾ÍOKÁË
+ åœ¨è¿è¡Œjavaä»£ç å°±OKäº†
 
-ÉÏÃæµÚÒ»ÖÖ·½·¨
+ä¸Šé¢ç¬¬ä¸€ç§æ–¹æ³•
 
-JedisÁ¬½Ó³ØµÄÊ¹ÓÃ
+Jedisè¿æ¥æ± çš„ä½¿ç”¨
 
-µÚ¶şÖÖÉèÖÃÃÜÂë
-ĞŞ¸Äbin/redis.conf ÖĞĞŞ¸Ä protected-mode no ¸ÄÎªyes
-È»ºó¹Ø±Õ
+ç¬¬äºŒç§è®¾ç½®å¯†ç 
+ä¿®æ”¹bin/redis.conf ä¸­ä¿®æ”¹ protected-mode no æ”¹ä¸ºyes
+ç„¶åå…³é—­
 [root@bogon redis]# bin/redis-cli shutdown
-ÔÙÆô¶¯
+å†å¯åŠ¨
 [root@bogon redis]# bin/redis-server redis.conf 
 
-ÉèÖÃÃÜÂë
+è®¾ç½®å¯†ç 
 [root@bogon redis]# bin/redis-cli 
 127.0.0.1:6379> config set requirepass 123456
 ok
 127.0.0.1:6379>quit
-Í¨¹ıÃÜÂë½øÈë
+é€šè¿‡å¯†ç è¿›å…¥
 [root@bogon redis]# bin/redis-cli 
 127.0.0.1:6379>auth 123456
 ok
 127.0.0.1:6379>
 
-java´úÂëÒª¼ÓÃÜÂëjedis.auth("123456")£»²»¼Ó±¨´í
+javaä»£ç è¦åŠ å¯†ç jedis.auth("123456")ï¼›ä¸åŠ æŠ¥é”™
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -139,9 +238,9 @@ import redis.clients.jedis.JedisPoolConfig;
 public class JedisPooltest {
 public static void main(String[] args) {
 		
-		JedisPoolConfig config= new JedisPoolConfig(); //Á¬½ÓÅäÖÃ
-		config.setMaxTotal(100); //ÉèÖÃÁ¬½ÓÊı×î´ó100¸ö
-		config.setMaxIdle(10); //×î´ó¿ÕÏĞÁ¬½ÓÊı10¸ö
+		JedisPoolConfig config= new JedisPoolConfig(); //è¿æ¥é…ç½®
+		config.setMaxTotal(100); //è®¾ç½®è¿æ¥æ•°æœ€å¤§100ä¸ª
+		config.setMaxIdle(10); //æœ€å¤§ç©ºé—²è¿æ¥æ•°10ä¸ª
 		
 		JedisPool  jedisPool =new JedisPool(config ,"192.168.1.102",6379);
 		Jedis jedis=null; 
@@ -155,23 +254,23 @@ public static void main(String[] args) {
 			e.printStackTrace();
 		}finally{
 			if(jedis!=null){
-				jedis.close(); //ÊÍ·Å
+				jedis.close(); //é‡Šæ”¾
 			}
 			if(jedisPool!=null){
-				jedisPool.close(); //ÊÍ·Å
+				jedisPool.close(); //é‡Šæ”¾
 			}
 		}
 		
 	}
 
-´î¼¯ÈºÇ°ÒªÉ¾³ıÒÔÇ°²Ù×÷µÄÊı¾İ£¬²»È»»á±¨´í £¬ »¹ÒªÖØĞÂÉ¾³ıµô
-¼¯ÈºÅäÖÃ
-½øÈëcd download/redis-3.2.11/src/ÏÈ¿½±´redis-trib.rbµ½/usr/local/binÂ·¾¶ÏÂ
+æ­é›†ç¾¤å‰è¦åˆ é™¤ä»¥å‰æ“ä½œçš„æ•°æ®ï¼Œä¸ç„¶ä¼šæŠ¥é”™ ï¼Œ è¿˜è¦é‡æ–°åˆ é™¤æ‰
+é›†ç¾¤é…ç½®
+è¿›å…¥cd download/redis-3.2.11/src/å…ˆæ‹·è´redis-trib.rbåˆ°/usr/local/binè·¯å¾„ä¸‹
 [root@bogon /]# cd download/redis-3.2.11/src/
 [root@bogon src]# cp redis-trib.rb  /usr/local/bin
 
 
-1.ÏÈÅäÖÃ¶Ë¿Ú£¬½øÈëÅäÖÃÎÄ¼şĞŞ¸Ä
+1.å…ˆé…ç½®ç«¯å£ï¼Œè¿›å…¥é…ç½®æ–‡ä»¶ä¿®æ”¹
 
 
 
